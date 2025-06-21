@@ -4,3 +4,6 @@ node_modules/
 # SSL certs
 cert.pem
 key.pem
+
+# dotenv
+.env
