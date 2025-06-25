@@ -30,7 +30,17 @@ function verifyCallback(accessToken, refreshToken, profile, done) {
     done(null, profile);
 }
 
-passport.use(new Strategy(AUTH_OPTIONS, verifyCallback))
+passport.use(new Strategy(AUTH_OPTIONS, verifyCallback));
+
+// Save session to cookie
+passport.serializeUser((user, done) => {
+    done(null, user.id);
+});
+
+// Read session from cookie
+passport.deserializeUser((id, done) => {
+    done(null, id);
+});
 
 const options = {
     key: fs.readFileSync('./key.pem'),
@@ -59,8 +69,8 @@ app.use((req, res, next) => {
     }
     next();
 });
-
 app.use(passport.initialize());
+app.use(passport.session());
 
 function checkLoggedIn(req, res, next) {
     const isLoggedIn = true; // TODO
@@ -82,7 +92,7 @@ app.get('/auth/google/callback',
     passport.authenticate('google', {
         failureRedirect: '/failure',
         successRedirect: '/',
-        session: false,
+        session: true,
     }), 
     (req, res) => {
         console.log('Google called us back!');
