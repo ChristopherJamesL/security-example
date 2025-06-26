@@ -73,7 +73,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 function checkLoggedIn(req, res, next) {
-    const isLoggedIn = true; // TODO
+    console.log('current user: ', req.user); // req.isAuthenticated() &&
+    const isLoggedIn =  req.user;
     if (!isLoggedIn) {
         return res.status(401).json({
             error: 'You must log in!',
@@ -99,7 +100,12 @@ app.get('/auth/google/callback',
     }
 );
 
-app.get('/auth/logout', (req, res) => {});
+app.get('/auth/logout', (req, res, next) => {
+    req.logout((err) => {
+        if (err) return next(err);
+        res.redirect('/');
+    });
+});
 
 app.get('/secret', checkLoggedIn, (req, res) => {
     return res.send(`Your personal secret value is 42`);
